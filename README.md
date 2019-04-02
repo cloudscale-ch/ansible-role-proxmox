@@ -409,7 +409,22 @@ pve_cluster_ring0_addr: "{{ ansible_default_ipv4.address }}"
 pve_cluster_bindnet0_addr: "{{ pve_cluster_ring0_addr }}"
 # pve_cluster_ring1_addr: "another interface's IP address or hostname"
 # pve_cluster_bindnet1_addr: "{{ pve_cluster_ring1_addr }}"
+```
 
+You can also configure [HA manager groups][ha-group]:
+```
+pve_cluster_ha_groups: [] # List of HA groups to create in PVE.
+```
+
+This example creates a group "lab_node01" for resources assigned to the
+lab-node01 host:
+```
+pve_cluster_ha_groups:
+  - name: lab_node01
+    comment: "My HA group"
+    nodes: "lab-node01"
+    nofailback: 0
+    restricted: 0
 ```
 
 ## Dependencies
@@ -543,3 +558,4 @@ Fabien Brachere ([@Fbrachere](https://github.com/Fbrachere))
 [group-module]: https://github.com/lae/ansible-role-proxmox/blob/master/library/proxmox_group.py
 [acl-module]: https://github.com/lae/ansible-role-proxmox/blob/master/library/proxmox_group.py
 [storage-module]: https://github.com/lae/ansible-role-proxmox/blob/master/library/proxmox_storage.py
+[ha-group]: https://pve.proxmox.com/wiki/High_Availability#ha_manager_groups
