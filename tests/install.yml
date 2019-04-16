@@ -53,3 +53,31 @@
       - name: Create host SSL certificate
         shell: "openssl x509 -req -in {{ ssl_host_csr_path }} -CA {{ ssl_ca_cert_path }} -CAkey {{ ssl_ca_key_path }} -days 1 -CAcreateserial -sha256 -out {{ ssl_host_cert_path }}"
       delegate_to: localhost
+
+    - name: Create sparse files for loop block devices
+      command: "truncate -s 50G /tmp/osd{{ item }}.img"
+      args:
+        creates: "/tmp/osd{{ item }}.img"
+      with_items: [0, 1]
+
+    - name: Create loop devices nodes
+      command: "mknod -m 660 /dev/{{ item.name }} {{ item.type }} {{ item.major }} {{ item.minor }}"
+      args:
+        creates: "/dev/{{ item.name }}"
+      with_items:
+        - name: loop0
+          type: b
+          major: 7
+          minor: 0
+        - name: loop1
+          type: b
+          major: 7
+          minor: 0
+        - name: loop-control
+          type: c
+          major: 10
+          minor: 237
+
+    - name: Map loop block devices for Ceph OSDs
+      command: "losetup /dev/loop{{ item }} /tmp/osd{{ item }}.img"
+      with_items: [0, 1]
